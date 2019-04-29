@@ -2,6 +2,7 @@ const sleep = require('sleep-promise');
 const { Google } = require('./lib/Google');
 const { WebArchive } = require('./lib/WebArchive');
 const { Mail } = require('./lib/Mail');
+const {DomainAvailable} = require('./lib/DomainAvailable');
 /* 
 域名列表
 是否可以购买 
@@ -14,9 +15,10 @@ redirect数量
 
 
 let domainList = [
+    'lourugbyassociation.fr',
     'lindentapijten.nl',
     'elisaf.nl',
-    'fietsenverhuurdespar.nl',
+     'fietsenverhuurdespar.nl',
     'funbugxter.nl',
     'Make-Things-Happen.nl',
     'loblanboots.nl',
@@ -50,7 +52,7 @@ let domainList = [
     'GirlPagina.nl',
     'TransWay.aero',
     'dbzplanontwikkeling.nl',
-    'ElectroGrow.nl',
+    'ElectroGrow.nl', 
 ];
 
 
@@ -62,7 +64,7 @@ async function main() {
 
     for (let i = 0, len = domainList.length; i < len; i++) {
         let domain = domainList[i];
-        //是否available --- 待完成
+        
 
         //google index数量小于5或者大于200的跳过
         let gIndex = await (new Google(domain)).getIndex();
@@ -84,18 +86,24 @@ async function main() {
         let crawlInfo = await webArchive.getCrawlInfo();
         if (crawlInfo[crawlInfo.length - 1].redirect > 5) continue;
 
+        // 域名在godday上是否available
+
+        let available = await (new DomainAvailable()).check(domain);
+
         checkList.push({
             domain,
             gIndex,
             continuousYears,
-            crawlInfo
+            crawlInfo,
+            available
         });
-        /* console.log('暂停中');
-        await sleep(30000);
-        console.log('继续'); */
+        
+        await sleep(10000);
+       
     }
 
     if (!checkList.length) return;
+    
     (new Mail()).send(checkList);
 
 }
