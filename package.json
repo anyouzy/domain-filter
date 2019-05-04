@@ -1,9 +1,7 @@
 {
   "dependencies": {
-    "https-proxy-agent": "^2.2.1",
     "node-fetch": "^2.4.1",
     "nodemailer": "^6.1.1",
-    "puppeteer": "^1.15.0",
-    "sleep-promise": "^8.0.1"
+    "puppeteer": "^1.15.0"
   }
 }

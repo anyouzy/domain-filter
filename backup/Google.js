@@ -1,3 +1,5 @@
+const puppeteer = require('puppeteer');
+
 class Google {
 
     constructor() {
@@ -10,31 +12,55 @@ class Google {
         this.maxIndex = 200;
     }
 
-    async getIndexCnt(browser, domain) {
+    async filterByIndex(domainList, prices) {
 
+        const browser = await puppeteer.launch();
         const page = await browser.newPage();
 
-        let param = encodeURIComponent('site:' + domain);
-        let url = `https://www.google.com/search?q=${param}&oq=${param}&sourceid=chrome&ie=UTF-8&t=${Date.now()}`;
-        let content = '';
+        let data = {
+            domainList: [],
+            indexCnts: [],
+            prices: []
+        };
 
-        try {
-            await page.goto(url);
-            content = await page.content();
-        } catch (e) {
-            console.error(e.message);
-            return '网络错误';
+        for (let i = 0, len = domainList.length; i < len; i++) {
+
+            let domain = domainList[i];
+            let param = encodeURIComponent('site:' + domain);
+            let url = `https://www.google.com/search?q=${param}&oq=${param}&sourceid=chrome&ie=UTF-8`;
+            let content = '';
+            try {
+                await page.goto(url);
+                content = await page.content();
+            } catch (e) {
+                console.error(e.message);
+                data.domainList.push(domain);
+                data.indexCnts.push('网络错误');
+                data.prices.push(prices[i]);
+                continue;
+            }
+
+            if (content.match(this.regs.banned)) {
+                data.domainList.push(domain);
+                data.indexCnts.push('被google验证码拦截');
+                data.prices.push(prices[i]);
+                continue;
+            }
+
+            let indexCnt = content.match(this.regs.noIndex) ? 0 : Number.parseInt(content.match(this.regs.indexCnt)[1].replace(/,/g, ''));
+
+            if (indexCnt < this.minIndex || indexCnt > this.maxIndex) continue;
+
+            data.domainList.push(domain);
+            data.indexCnts.push(indexCnt);
+            data.prices.push(prices[i]);
+
         }
 
-        await page.close();
-        if (content.match(this.regs.banned)) return '被google验证码拦截';
 
-        let indexCnt = content.match(this.regs.noIndex) ? 0 : Number.parseInt(content.match(this.regs.indexCnt)[1].replace(/,/g, ''));
+        await browser.close();
 
-        if (indexCnt < this.minIndex || indexCnt > this.maxIndex) return -1;
-
-        return indexCnt;
-
+        return data;
     }
 
 }
@@ -43,6 +69,12 @@ class Google {
 module.exports = {
     Google
 };
+
+
+
+
+
+
 
 
 

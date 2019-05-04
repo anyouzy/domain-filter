@@ -23,6 +23,7 @@ class Mail {
             <tr>
                 <td>编号</td>
                 <td>域名</td>
+                <td>Godaddy售价</td>
                 <td>Google Index</td>
                 <td>快照连续数</td>
                 <td>抓取异常</td>
@@ -46,6 +47,7 @@ class Mail {
                 <tr>
                     <td>${index + 1}</td>
                     <td>${domain}</td>
+                    <td>${price}</td>
                     <td>${indexCnt}</td>
                     <td>${continuousYears}年</td>
                     <td>
