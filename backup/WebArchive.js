@@ -106,7 +106,7 @@ class WebArchive {
                             if (statusCode >= 300 && statusCode <= 399) {
                                 data.redirect++;
                             }
-                            if (statusCode >= 400 && statusCode <= 499) {
+                            if (statusCode >= 500) {
                                 data.error++;
                             }
                         })

@@ -41,11 +41,24 @@ class Google {
             }
 
             if (content.match(this.regs.banned)) {
+
+               /*  const frame = await page.frames().find(f => f.url().includes('https://www.google.com/recaptcha/api2/anchor'));
+                await Promise.all([
+                    page.waitForNavigation(),
+                    frame.click('.recaptcha-checkbox-checkmark'),
+                ]);
+                content = await page.content();
+                console.log(content); */
+
+                
                 data.domainList.push(domain);
                 data.indexCnts.push('被google验证码拦截');
                 data.prices.push(prices[i]);
                 continue;
+
             }
+
+
 
             let indexCnt = content.match(this.regs.noIndex) ? 0 : Number.parseInt(content.match(this.regs.indexCnt)[1].replace(/,/g, ''));
 
