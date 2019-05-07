@@ -28,20 +28,29 @@ class WebArchive {
     }
 
 
-    async hasArchiveInfo() {
+    async hasLatestArchiveInfo() {
         try {
             let res = await fetch(this.acyAPI);
-            let {
-                years
-            } = await res.json();
-            if (!years) return false;
-            this.archiveData = years;
-            this.archiveYears = Object.keys(this.archiveData).map(yearStr => Number.parseInt(yearStr));
-            return true;
+            let data = await res.json();
+            this.archiveData = data.years;
         } catch (e) {
             console.log(e.message);
             return -1;
         }
+        //没有抓取记录，过滤掉
+        if (0 === Object.keys(this.archiveData).length) return false;
+        this.archiveYears = Object.keys(this.archiveData).map(yearStr => Number.parseInt(yearStr));
+
+        //最近一年没有抓取记录，过滤掉
+        let currentYear = new Date().getFullYear();
+        if (!this.archiveYears.includes(currentYear)) {
+            if (!this.archiveYears.includes(currentYear - 1)) return false;
+            let lastYearData = this.archiveData[currentYear - 1];
+            let currentMonth = new Date().getMonth();
+            if (!lastYearData.slice(currentMonth).includes(1)) return false;
+        }
+
+        return true;
     }
 
 

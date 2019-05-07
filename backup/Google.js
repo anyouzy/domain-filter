@@ -9,7 +9,7 @@ class Google {
             banned: /you sending the requests, and not a robot/,
         };
         this.minIndex = 3;
-        this.maxIndex = 200;
+        this.maxIndex = 120;
     }
 
     async filterByIndex(domainList, prices) {

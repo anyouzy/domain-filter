@@ -12,7 +12,7 @@ class Mail {
             secure: true, // secure:true for port 465, secure:false for port 587
             auth: {
                 user: mail.sender.user,
-                pass: mail.sender.pass 
+                pass: mail.sender.pass
             }
         });
     }
@@ -60,7 +60,7 @@ class Mail {
 
         let mailOptions = {
             from: mail.sender.user,
-            to: mail.receivers[0],
+            to: mail.receivers.join(),
             subject: '请检查以下域名',
             html
         };
