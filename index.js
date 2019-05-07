@@ -1,246 +1,286 @@
-const puppeteer = require('puppeteer');
-
+//const sleep = require('sleep-promise');
 const {
-    ExpiredDomains
-} = require('./lib/ExpiredDomains');
+    Google
+} = require('./lib/Google');
+const {
+    WebArchive
+} = require('./lib/WebArchive');
 const {
     Mail
 } = require('./lib/Mail');
-
 const {
-    checkThisDomain
-} = require('./lib');
-
+    DomainAvailable
+} = require('./lib/DomainAvailable');
 
 let sourceDomainList = [
-    'Alien.cx',
-    '360-Event.fr',
-    'NickYoungDriving.co.uk',
-    'cfecgc67.fr',
-    'ars-consilium.fr',
-    'optiqueprogress.fr',
-    'Bellis.am',
-    'StockMoto.fr',
-    'Caps.am',
-    'KevinMarinProgramAdOr.es',
-    'location-veules-les-roses.fr',
-    'restaurant-boccaccio.fr',
-    'gasch.fr',
-    'caliceetcorolle.fr',
-    'PropertyManagement.id',
-    'guadalturia.es',
-    'KidsGarden-Alicante.es',
-    'rutasvinovalencia.es',
-    'GaliServices.es',
-    'Gps.org.es',
-    'conisco.es',
-    'cdvalldalba.es',
-    'sanygas10.es',
-    'reverdec.es',
-    'kebapenavila.es',
-    'concesionarioantoniobravo.es',
-    'zajednica-sru-vukovar.hr',
-    'oda.hr',
-    'ordinacija-martic.hr',
-    'cabinet-peltier-avocat.fr',
-    'pmp.hr',
-    'DelMat-Tours.hr',
-    'ebisa.fr',
-    'inisia.fr',
-    'sauver-son-couple.fr',
-    'antimoda.hr',
-    'bacic.hr',
-    'oka.hr',
-    'mros.hr',
-    'hrba.hr',
-    'RunArte.es',
-    'marketiko.eu',
-    'AranService.es',
-    'escobasdebruja.es',
-    'r4shopper.co.uk',
-    'BandEraEspanola.es',
-    'migoodtel.es',
-    'feweb-mathematicscourse.nl',
-    'comunidadrc.es',
-    'dyjmobiliario.es',
-    'integrareclinica.es',
-    'paulinoinmobiliaria.es',
-    'bminstalaciones.es',
-    'restaurantlediapason.fr',
-    'elejidoesmiprioridad.es',
-    'tandtjek.nu',
-    'RamaMetal.es',
-    'CodeOranje.nu',
-    'knullad.nu',
-    'Toyhouse.nu',
-    'NomIs.nu',
-    'kalaspaket.nu',
-    'cykeltjuven.nu',
-    'dekwast.nu',
-    'trapprenovering.nu',
-    'Haircare.nu',
-    'idg2c.es',
-    'DogSeven.es',
-    'centrointegrare.es',
-    'centrosintegrare.es',
-    'integrareclinicas.es',
-    'baloncerco.es',
-    'pedrazcabezasdentista.es',
-    'FredVision.es',
-    'JoyAs-Shop.es',
-    'OndaPhone.es',
-    'GregorioElias.es',
-    'umzuege.tel',
-    'buscajob.es',
-    'forumcomercial.es',
-    'alterqueso.es',
-    'China-Clutch.es',
-    'CoworkingSalamanca.es',
-    'intellimentsecurity.es',
-    'clinicasintegrare.es',
-    'portalculturalandaluz.es',
-    'InternetMadrid.es',
-    'uno-consulting.eu',
-    'EliasCasaDo.es',
-    'paz.nu',
-    'centrosrehabilitacion.es',
-    'BlubUtterFly.es',
-    'netdax.es',
-    'cepmenudets.es',
-    'PulsarPlay.es',
-    'iteciluminacion.es',
-    'ceipfedericogarcialorca.es',
-    'opigrum.es',
-    'escobadebruja.es',
-    'CorBatAs-Shop.es',
-    'gemeloscamisa-shop.es',
-    'cinturones-shop.es',
-    'tredzee.es',
-    'cheapple.es',
-    'remaja.co.id',
-    'flatroofersurbiton.co.uk',
-    'estilosabroso.es',
-    'aceroscorrugados.es',
-    'JobcentreContactNumber.co.uk',
-    'murcinova.es',
-    'MaxHeadroom.nu',
-    'DotInfra.tel',
-    'szaszet-tiszk.eu',
-    'trufo.es',
-    'amorevero.es',
-    'Tube.com.es',
-    'VisualMerchandising.es',
-    'ubersetzung.es',
-    'Tuscany-Travel.es',
-    'talser.es',
-    'alagrec.eu',
-    '2015.com.es',
-    'projektledaren.nu',
-    'juegosmil.es',
-    'Saver.es',
-    'ayuntamientodeillano.es',
-    'qadabra.es',
-    'proservis.es',
-    'PremierMusic.es',
-    'SexVote.es',
-    'saymor.es',
-    'Save4You.es',
-    'nummos.es',
-    'necronet.es',
-    'tme.nu',
-    'ofertando.es',
-    'nadons.es',
-    'Pashmina-Shop.es',
-    'OnFocus.es',
-    'thermalogica.co.uk',
-    'monetbar.es',
-    'minuskel.es',
-    'mchn.es',
-    'MadridStock.es',
-    'loteriadiadelpadre.es',
-    'loteriadiadelosenamorados.es',
-    'loshoyosportugalete.es',
-    'microimplantes.es',
-    'lashou.es',
-    'lacuevapintada.es',
-    'l-carnitina.es',
-    'juegos1000.es',
-    'TheNorthFaceCheap.co.uk',
-    'websg.eu',
-    'dmmdistribution.eu',
-    'juliocaminas.es',
-    'juegoszaping.es',
-    'l-arginina.es',
-    'Jigsaw.es',
-    'imaglass.es',
-    'islajuegos.es',
-    'www28456.cc',
-    'yolike.tv',
-    'maninthearena.tv',
-    'Friend.tv',
-    'Templar.tv',
-    'PerfectCoverage.tv',
-    'RemindMeLater.cc',
-    'Unlike.tv',
-    'rse.tv',
-    'Reaction.tv',
-    'jornalnacional.tv',
-    'BetSystem.cc',
-    'SpeedKings.tv',
-    'hogarverde.es',
-    'KitchenWakefield.co.uk',
-    'HangzhouWan.cc',
-    'shijueyishu.cc',
-    'takip.cc',
-    'suofeier.cc',
-    'explora.cc',
-    '820yy.cc',
-    'Garbage.cc',
-    'premasaakshi.tv',
-    'Malawi.cc',
-    'PrivateEquity.cc',
-    'Andrei.tv',
-    'vutune.tv',
-    'Affiliated.cc',
-    'xiaobb.cc',
-    'newhopebc.tv',
-    'UppsalaStudent.tv',
-    'toryumedia.tv',
-    'yupin.tv',
-    'ooknow.tv',
-    'FreeSyria.tv',
-    'Sunrooms.tv',
-    'Approval.cc',
-    'Elections.cc',
-    'intim-city.cc',
-
+    'pyinoolwin.org',
+    'TheAlternativeMedicine.org',
+    'ansaeba.org',
+    '23aprel.org',
+    'TopZero.org',
+    'hvo-bad-steben.org',
+    'wvfurs.org',
+    'LatinFaces.org',
+    'Sign4FemaleCondoms.org',
+    'NeverendingArt.org',
+    'poytner.org',
+    'grgg.org',
+    'BuildingGamesOnline.org',
+    'HightechJobs.org',
+    'russkoeveche.org',
+    'CasinoGameStop.org',
+    'revolutas.org',
+    'AwarenessRibbon.org',
+    'OrgSoftCom.org',
+    'lhc8.org',
+    'aafhe.org',
+    'adevalles.org',
+    'lafabbrica.org',
+    'AmmaCroatia.org',
+  /*   'makosh.org',
+    'thaidhamma.org',
+    'in-medias-res.org',
+    'may29th.org',
+    'euromab.org',
+    'fondazionenovalia.org',
+    'staggpac.org',
+    'poetreecreations.org',
+    'AccaFlorida.org',
+    'SalvationArmyAntigua.org',
+    'NatureOfReality.org',
+    'ChangeBucket.org',
+    'moda2016.org',
+    'Innovation-Studio.org',
+    'latinfe.org',
+    'reztemplechurch.org',
+    'klirosi.org',
+    'DesertViewDental.org',
+    'AntiCholesterol.org',
+    'GenerationDevelopment.org',
+    'HillbillyHaiku.org',
+    'UniversityOfHargeisa.org',
+    'stlukesrak.org',
+    'duygusal.org',
+    'AtRoche.org',
+    'reweon.org',
+    'RotaryDoctorBank.org',
+    'RobotMenAger.org',
+    'bahedc.org',
+    'ChakraTantraTemple.org',
+    'TheScienceRoom.org',
+    'sanfrancisco2013.org',
+    'bilet-avion.org',
+    'HabitatRome.org',
+    'koinema.org',
+    'ashlandymcaoh.org',
+    'wapainc.org',
+    'NetSnow.org',
+    'HideSeek.org',
+    'BlueFrost.org',
+    'stadsvernieuwing.org',
+    'FamilyAidsCoalition.org',
+    'bobwilsonmemorial.org',
+    'NeufLow.org',
+    'Meadowlarks.org',
+    'IranPolicyCommittee.org',
+    'dolstyle.org',
+    'AndHist.org',
+    'FilmUs.org',
+    'LetterToObama.org',
+    'SlapCancer.org',
+    'olejlniany.org',
+    'MidwestOrganic.org',
+    'Bit0.org',
+    'ArtistsForumWorkshop.org',
+    'HomeTheaterSetup.org',
+    'oinori.org',
+    'IceCrown.org',
+    'CelebrityChef.org',
+    'daizucms.org',
+    'dnatestingcost.org',
+    'rejuca.org',
+    'info-anons.org',
+    'mthopelearningcenter.org',
+    'dosar.org',
+    'DefendingWisconsin.org',
+    'fundacionangelesalrescate.org',
+    'ItalianFilmFestival.org',
+    'VideoHotel.org',
+    'nirogilanka.org',
+    'AdPort.org',
+    'cvrdc.org',
+    'nwnhs.org',
+    'ArizonaAttorney.org',
+    'DrupalDojo.org',
+    'sdmedical.org',
+    'sierraclub-nc.org',
+    'ealm.org',
+    'Himp3.org',
+    'FlightBook.org',
+    'copma.org',
+    'almazclub.org',
+    'DarienYouthFieldHockey.org',
+    'ciodep.org',
+    'ThePowerOfIllusion.org',
+    'TaylorJames.org',
+    'SolarRoofTiles.org',
+    'gbc-orangeva.org',
+    'HumanRightsBudgetWork.org',
+    'MediaTecAroma.org',
+    'lincolncountyema.org',
+    'RestoreEmail.org',
+    'dapurqq.org',
+    'naughtystepbdd.org',
+    'btclend.org',
+    'ww1archaeology.org',
+    'UniteForPublicServices.org',
+    'CreditRepairKits.org',
+    'ArchIcon.org',
+    'nsbepax.org',
+    'reactiv.org',
+    'CanoeKayakSable.org',
+    'Swine-Flu.org',
+    'xjobs.org',
+    'HooverFirst.org',
+    'Gauche2012.org',
+    '11a.org',
+    'SpragueBrothers.org',
+    'CalmTheBasin.org',
+    'SartOnline.org',
+    'nnvsdiasporanigerians.org',
+    'wecu2.org',
+    'HeartCoaching.org',
+    'JustTen.org',
+    'theopolis.org',
+    'langtu.org',
+    'lrgwateroflife.org',
+    'GraduateStudentCaucus.org',
+    'guijia.org',
+    'whidbeymonks.org',
+    'odnowa-coventry.org',
+    'xi2.org',
+    'Link8.org',
+    'tpark.org',
+    'StayUndesirable.org',
+    'Pro-International.org',
+    'ImperialCoin.org',
+    'asysokak.org',
+    'Americans-By-Choice.org',
+    'OklahomaJazz.org',
+    'SeoCompanyDelhi.org',
+    'izquierdaeco.org',
+    'Volunteers-Solid.org',
+    'chdcambodia.org',
+    'ToMori.org',
+    'gyu-edu.org',
+    'ShinyDemise.org',
+    'aresdanismanlik.org',
+    'ElkSuriname.org',
+    '911ca.org',
+    '1111mx.org',
+    'tss2015.org',
+    'wiki-control-de-plagas.org',
+    'spanishhealthministryinc.org',
+    'sttimothysanglicanyouth.org',
+    'SoHorace.org',
+    'EthicalPup.org',
+    'nuovistilidivitapadova.org',
+    'video-institucional.org',
+    'CamarilloSunriseRotary.org',
+    'xping.org',
+    'womenspbc.org',
+    '88lt.org',
+    '1000Foods.org',
+    'HouseOfHopeForWomen.org',
+    'g4cstudentchallenge.org',
+    'kodlamasaati.org',
+    '10YouTube.org',
+    'AlexanderGeorge.org',
+    'PisgahCycling.org',
+    '5Horsemen.org',
+    'Nano-Gel.org',
+    'rodobrana.org',
+    'SandersForPresident.org',
+    'druide.org',
+    'GatoKitty.org',
+    'farmaciapopular.org',
+    'drtekemiadorsey.org',
+    'hkjepf.org',
+    'heartofedmondssd.org',
+    'rumbleinrio.org',
+    'preventionsuicidemcq.org',
+    'madewithloveinparis.org',
+    'Team206.org',
+    'pensandoenriver.org',
+    'epyskopat.org', */
 
 ];
 
-
-(async () => {
-
-    /*  let sourceDomainList = await new ExpiredDomains().fetch();
-     if (!sourceDomainList.length) return;
-  */
-    const browser = await puppeteer.launch();
-    let checkList = [];
-    let checkCnt = 0;
+let checkList = [];
 
 
-    for (let i = 0, len = sourceDomainList.length; i < len; i++) {
 
-        let domain = sourceDomainList[i];
+async function main() {
 
-        checkThisDomain(browser, domain)
-            .then(async (data) => {
-                checkCnt++;
-                if (data.shouldInCheckList) checkList.push(data);
-                if (checkCnt === len) {
-                    await browser.close();
-                    if (!checkList.length) return;
-                    (new Mail()).send(checkList);
-                }
-            });
+
+    //获取域名列表----待完成
+
+    // 过滤在godday not available的域名
+    let {
+        availableDomainList,
+        availablePrices
+    } = await (new DomainAvailable()).check(sourceDomainList);
+
+    if (!availableDomainList.length) return;
+
+
+    //过滤没有google index活着index大于120的域名
+    let {
+        domainList,
+        indexCnts,
+        prices
+    } = await (new Google()).filterByIndex(availableDomainList, availablePrices);
+    return;
+
+    if (!domainList.length) return;
+
+    //webarchive过滤
+    for (let i = 0, len = domainList.length; i < len; i++) {
+        let domain = domainList[i];
+
+        let webArchive = new WebArchive(domain);
+        let hasLatestArchiveInfo = await webArchive.hasLatestArchiveInfo();
+        //近期没有抓取记录的过滤掉
+        if (false === hasLatestArchiveInfo) continue;
+
+
+        //连续年数小于3的跳过
+        let continuousYears = webArchive.getContinuousYears();
+        if (continuousYears < 3) continue;
+
+
+        //最后一年跳转超过5次跳过
+        let crawlInfo = await webArchive.getCrawlInfo();
+        let redirectCnt = crawlInfo[crawlInfo.length - 1].redirect;
+        if (typeof (redirectCnt) === 'number' && redirectCnt > 5) continue;
+
+
+        checkList.push({
+            domain,
+            price: prices[i],
+            indexCnt: indexCnts[i],
+            continuousYears,
+            crawlInfo,
+        });
+
+        //await sleep(10000);
+
     }
-})();
+    if (!checkList.length) return;
+
+    (new Mail()).assignTask(checkList);
+
+}
+
+
+main();
